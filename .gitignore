@@ -1,0 +1,50 @@
+# Helix AI — Pharmaceutical AI Stack
+# Remote & Local Configuration
+
+# ── Environment & Secrets ──────────────────────────────────────
+# NEVER commit credentials or API keys to GitHub
+.env
+settings/.env
+settings/anythingllm.env
+
+# ── OS-specific ────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# ── Docker & Data ──────────────────────────────────────────────
+# Exclude persistent storage and temporary data
+storage/
+data/
+db/
+*.db
+*.sqlite
+*.sqlite-journal
+
+# ── Logs & Debugging ──────────────────────────────────────────
+# Keep the repo clean from operational debris
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.sh_history
+
+# ── CI/CD & IDE ────────────────────────────────────────────────
+.vscode/
+.idea/
+.project
+.settings/
+.classpath
+.factorypath
+build/
+dist/
+node_modules/
+.venv/
+env/
+venv/
+lib/
+bin/grounding_heartbeat.pid

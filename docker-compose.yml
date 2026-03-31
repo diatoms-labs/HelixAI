@@ -1,0 +1,119 @@
+# ============================================================
+# Helix AI — AnythingLLM + LiteLLM + Source Tracker
+# Ollama runs NATIVELY on Mac (outside Docker) for CPU perf
+# ============================================================
+
+networks:
+  helix:
+    driver: bridge
+
+volumes:
+  anythingllm_storage:
+  litellm_data:
+
+services:
+
+  # ── AnythingLLM ───────────────────────────────────────────
+  anythingllm:
+    image: mintplexlabs/anythingllm:latest
+    container_name: helix_anythingllm
+    restart: unless-stopped
+    ports:
+      - "3002:3001"
+    networks:
+      - helix
+    volumes:
+      - anythingllm_storage:/app/server/storage
+      - ../published_docs:/app/collector/hotdir/published_docs
+      - ../knowledge-base:/app/collector/hotdir/knowledge-base
+      - ./settings/anythingllm.env:/app/server/.env
+    environment:
+      - SERVER_PORT=3001
+      - STORAGE_DIR=/app/server/storage
+
+      # ── LLM: point to native Ollama on Mac host ──────────
+      - LLM_PROVIDER=ollama
+      - OLLAMA_BASE_PATH=http://host.docker.internal:11434
+      - OLLAMA_MODEL_PREF=helix-ai
+      - OLLAMA_MODEL_TOKEN_LIMIT=8192
+      - OLLAMA_KEEP_ALIVE_TIMEOUT=300
+
+      # ── Embedding: local Ollama (no cloud calls for embed) ─
+      - EMBEDDING_ENGINE=ollama
+      - EMBEDDING_BASE_PATH=http://host.docker.internal:11434
+      - EMBEDDING_MODEL_PREF=nomic-embed-text
+      - EMBEDDING_MODEL_MAX_CHUNK_LENGTH=512
+
+      # ── Vector DB: built-in LanceDB (zero config) ─────────
+      - VECTOR_DB=lancedb
+
+      # ── Auth ───────────────────────────────────────────────
+      - AUTH_TOKEN=${AUTH_TOKEN:-helix-ai-secret-change-me}
+      - JWT_SECRET=${JWT_SECRET:-helix-ai-jwt-secret-change-me-32chars}
+
+      # ── Source citation (critical for pharma traceability) ─
+      - AGENT_USE_DUCKDUCKGO_SEARCH=true
+      - SHOW_DOCUMENT_CITATIONS=true
+      - DEFAULT_AGENT_SKILLS=web-browsing,document-summarization
+
+      # ── Single-tenant mode (AUTH_TOKEN = API key for automation) ─
+      - MULTI_USER_MODE=false
+      - DISABLE_TELEMETRY=true
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # ── LiteLLM — unified model gateway ──────────────────────
+  litellm:
+    image: ghcr.io/berriai/litellm:main-latest
+    container_name: helix_litellm
+    restart: unless-stopped
+    ports:
+      - "8100:8000"
+    networks:
+      - helix
+    volumes:
+      - ./settings/litellm_config.yaml:/app/config.yaml
+      - litellm_data:/app/data
+    command: --config /app/config.yaml --port 8000 --detailed_debug
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - LITELLM_MASTER_KEY=${LITELLM_MASTER_KEY:-helix-litellm-key}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # ── Hook — source attribution middleware ────────────────────
+  hook:
+    build:
+      context: ./hook
+      dockerfile: Dockerfile
+    container_name: helix_hook
+    restart: unless-stopped
+    ports:
+      - "5055:5050"
+    networks:
+      - helix
+    environment:
+      - ANYTHINGLLM_URL=http://anythingllm:3001
+      - LITELLM_URL=http://litellm:8000
+      - OLLAMA_URL=http://host.docker.internal:11434
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - anythingllm
+      - litellm

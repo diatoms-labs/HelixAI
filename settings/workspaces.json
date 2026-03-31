@@ -1,0 +1,44 @@
+{
+  "workspaces": [
+    {
+      "name":       "QA Confidential",
+      "slug":       "qa-confidential",
+      "model":      "helix-ai:latest",
+      "data_class": "A",
+      "teams":      ["QA Engineers", "QA Managers"],
+      "doc_folder": "/Users/venkateshwarlu/Documents/knowledge-base",
+      "description": "SOPs, CAPA, batch records, deviation reports"
+    },
+    {
+      "name":       "RD Internal",
+      "slug":       "rd-internal",
+      "model":      "helix-ai:latest",
+      "data_class": "A",
+      "teams":      ["R&D Scientists", "Formulation Team"],
+      "doc_folder": "/Users/venkateshwarlu/Documents/knowledge-base",
+      "description": "Lab notebooks, formulation notes, analytical data"
+    },
+    {
+      "name":       "Regulatory Confidential",
+      "slug":       "regulatory-confidential",
+      "model":      "helix-ai:latest",
+      "data_class": "A",
+      "teams":      ["Regulatory Affairs"],
+      "doc_folder": "/Users/venkateshwarlu/Documents/knowledge-base",
+      "description": "Submissions, dossiers, regulatory guidance"
+    },
+    {
+      "name":       "General Research",
+      "slug":       "general-research",
+      "model":      "helix-ai:latest",
+      "data_class": "C",
+      "teams":      ["All Staff"],
+      "doc_folder": "/Users/venkateshwarlu/Documents/published_docs",
+      "description": "General pharma queries, published documents"
+    }
+  ],
+  "external_folders": {
+    "knowledge-base": "/Users/venkateshwarlu/Documents/knowledge-base",
+    "published_docs": "/Users/venkateshwarlu/Documents/published_docs"
+  }
+}
