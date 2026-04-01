@@ -24,7 +24,7 @@ services:
       - helix
     volumes:
       - anythingllm_storage:/app/server/storage
-      - ../published_docs:/app/collector/hotdir/published_docs
+      - ../published-docs:/app/collector/hotdir/published-docs
       - ../knowledge-base:/app/collector/hotdir/knowledge-base
       - ./settings/anythingllm.env:/app/server/.env
     environment:

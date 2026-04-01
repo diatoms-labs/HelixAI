@@ -33,12 +33,12 @@
       "model":      "helix-ai:latest",
       "data_class": "C",
       "teams":      ["All Staff"],
-      "doc_folder": "/Users/venkateshwarlu/Documents/published_docs",
+      "doc_folder": "/Users/venkateshwarlu/Documents/published-docs",
       "description": "General pharma queries, published documents"
     }
   ],
   "external_folders": {
     "knowledge-base": "/Users/venkateshwarlu/Documents/knowledge-base",
-    "published_docs": "/Users/venkateshwarlu/Documents/published_docs"
+    "published-docs": "/Users/venkateshwarlu/Documents/published-docs"
   }
 }
